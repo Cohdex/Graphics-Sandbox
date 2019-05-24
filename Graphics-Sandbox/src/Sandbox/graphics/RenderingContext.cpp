@@ -10,6 +10,7 @@ namespace sbx
 	}
 
 	RenderingContext::RenderingContext(int screenWidth, int screenHeight)
+		: m_window(nullptr)
 	{
 		init(screenWidth, screenHeight);
 	}
@@ -18,6 +19,7 @@ namespace sbx
 	{
 		m_vertexArrays.clear();
 		m_vertexBuffers.clear();
+		m_indexBuffers.clear();
 		glfwTerminate();
 	}
 
@@ -44,7 +46,7 @@ namespace sbx
 
 		glfwMakeContextCurrent(m_window);
 
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 		{
 			std::cout << "Failed to initialize GLAD" << std::endl;
 			glfwTerminate();
@@ -54,17 +56,35 @@ namespace sbx
 		std::cout << "OpenGL version: " << GLVersion.major << "." << GLVersion.minor << std::endl;
 	}
 
-	VertexArray& RenderingContext::createVertexArray()
+	bool RenderingContext::running()
 	{
-		auto vertexArray = std::make_unique<VertexArray>();
+		return !glfwWindowShouldClose(m_window);
+	}
+
+	void RenderingContext::update()
+	{
+		glfwPollEvents();
+		glfwSwapBuffers(m_window);
+	}
+
+	VertexArray& RenderingContext::createVertexArray(unsigned int numElements)
+	{
+		auto vertexArray = std::make_unique<VertexArray>(numElements);
 		m_vertexArrays.push_back(std::move(vertexArray));
 		return *m_vertexArrays.back();
 	}
 
-	VertexBuffer& RenderingContext::createVertexBuffer(void* data, size_t size)
+	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<float>& data)
 	{
-		auto vertexBuffer = std::make_unique<VertexBuffer>(data, size);
+		auto vertexBuffer = std::make_unique<VertexBuffer>(data);
 		m_vertexBuffers.push_back(std::move(vertexBuffer));
 		return *m_vertexBuffers.back();
+	}
+
+	IndexBuffer& RenderingContext::createIndexBuffer(const std::vector<unsigned int>& data)
+	{
+		auto indexBuffer = std::make_unique<IndexBuffer>(data);
+		m_indexBuffers.push_back(std::move(indexBuffer));
+		return *m_indexBuffers.back();
 	}
 }

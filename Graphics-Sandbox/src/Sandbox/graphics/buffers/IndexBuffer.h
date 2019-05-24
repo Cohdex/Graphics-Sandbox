@@ -4,14 +4,14 @@
 
 namespace sbx
 {
-	class VertexBuffer
+	class IndexBuffer
 	{
 	private:
 		unsigned int m_id;
 
 	public:
-		VertexBuffer(const std::vector<float>& data);
-		~VertexBuffer();
+		IndexBuffer(const std::vector<unsigned int>& data);
+		~IndexBuffer();
 
 		void bind() const;
 	};

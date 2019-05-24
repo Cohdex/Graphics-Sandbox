@@ -6,7 +6,8 @@
 
 namespace sbx
 {
-	VertexArray::VertexArray()
+	VertexArray::VertexArray(unsigned int numElements)
+		: m_numElements(numElements), m_hasIndexBuffer(false)
 	{
 		glGenVertexArrays(1, &m_id);
 	}
@@ -18,12 +19,24 @@ namespace sbx
 
 	void VertexArray::bindVertexBuffer(const VertexBuffer& vertexBuffer, std::vector<VertexAttribute> vertexAttribs)
 	{
-		glBindVertexArray(m_id);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.m_id);
+		bind();
+		vertexBuffer.bind();
 		for (auto attrib : vertexAttribs)
 		{
-			glVertexAttribPointer(attrib.index, attrib.size, GL_FLOAT, GL_FALSE, attrib.size * sizeof(float), (void*) attrib.offset);
+			glVertexAttribPointer(attrib.index, attrib.size, GL_FLOAT, GL_FALSE, attrib.size * sizeof(float), reinterpret_cast<void*>(attrib.offset));
 			glEnableVertexAttribArray(attrib.index);
 		}
+	}
+
+	void VertexArray::bindIndexBuffer(const IndexBuffer& indexBuffer)
+	{
+		bind();
+		indexBuffer.bind();
+		m_hasIndexBuffer = true;
+	}
+
+	void VertexArray::bind() const
+	{
+		glBindVertexArray(m_id);
 	}
 }

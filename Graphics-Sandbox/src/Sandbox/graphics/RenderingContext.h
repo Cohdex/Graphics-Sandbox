@@ -17,6 +17,7 @@ namespace sbx
 
 		std::vector<std::unique_ptr<VertexArray>> m_vertexArrays;
 		std::vector<std::unique_ptr<VertexBuffer>> m_vertexBuffers;
+		std::vector<std::unique_ptr<IndexBuffer>> m_indexBuffers;
 
 		void init(int screenWidth, int screenHeight);
 
@@ -24,7 +25,12 @@ namespace sbx
 		RenderingContext(int screenWidth, int screenHeight);
 		~RenderingContext();
 
-		VertexArray& createVertexArray();
-		VertexBuffer& createVertexBuffer(void* data, size_t size);
+		bool running();
+
+		void update();
+
+		VertexArray& createVertexArray(unsigned int numElements);
+		VertexBuffer& createVertexBuffer(const std::vector<float>& data);
+		IndexBuffer& createIndexBuffer(const std::vector<unsigned int>& data);
 	};
 }
