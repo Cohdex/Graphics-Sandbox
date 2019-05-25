@@ -21,7 +21,8 @@ project "Graphics-Sandbox"
 	files {
 		"%{prj.name}/include/**.h",
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/res/**"
 	}
 
 	includedirs {

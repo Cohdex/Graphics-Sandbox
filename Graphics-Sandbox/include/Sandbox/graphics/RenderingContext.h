@@ -21,8 +21,6 @@ namespace sbx
 		std::vector<std::unique_ptr<IndexBuffer>> m_indexBuffers;
 		std::vector<std::unique_ptr<Shader>> m_shaders;
 
-		void init(int screenWidth, int screenHeight);
-
 	public:
 		RenderingContext(int screenWidth, int screenHeight);
 		~RenderingContext();

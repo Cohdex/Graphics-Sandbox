@@ -9,22 +9,32 @@ namespace sbx
 		std::cout << "GLFW error(" << error << "): " << description << std::endl;
 	}
 
+	static void glad_pre_callback(const char* name, void* funcptr, int len_args, ...)
+	{
+		while (glad_glGetError() != GL_NO_ERROR);
+	}
+
+	static void glad_post_callback(const char* name, void* funcptr, int len_args, ...)
+	{
+		std::vector<unsigned int> errors;
+		unsigned int error;
+		while ((error = glad_glGetError()) != GL_NO_ERROR)
+		{
+			errors.push_back(error);
+		}
+		if (!errors.empty())
+		{
+			std::cout << "GL function " << name << " caused errors: { ";
+			for (unsigned int error : errors)
+			{
+				std::cout << error << " ";
+			}
+			std::cout << "}" << std::endl;
+		}
+	}
+
 	RenderingContext::RenderingContext(int screenWidth, int screenHeight)
 		: m_window(nullptr)
-	{
-		init(screenWidth, screenHeight);
-	}
-
-	RenderingContext::~RenderingContext()
-	{
-		m_vertexArrays.clear();
-		m_vertexBuffers.clear();
-		m_indexBuffers.clear();
-		m_shaders.clear();
-		glfwTerminate();
-	}
-
-	void RenderingContext::init(int screenWidth, int screenHeight)
 	{
 		glfwSetErrorCallback(glfw_error_callback);
 
@@ -54,7 +64,19 @@ namespace sbx
 			throw;
 		}
 
+		glad_set_pre_callback(glad_pre_callback);
+		glad_set_post_callback(glad_post_callback);
+
 		std::cout << "OpenGL version: " << GLVersion.major << "." << GLVersion.minor << std::endl;
+	}
+
+	RenderingContext::~RenderingContext()
+	{
+		m_vertexArrays.clear();
+		m_vertexBuffers.clear();
+		m_indexBuffers.clear();
+		m_shaders.clear();
+		glfwTerminate();
 	}
 
 	bool RenderingContext::running()
@@ -70,29 +92,21 @@ namespace sbx
 
 	VertexArray& RenderingContext::createVertexArray(unsigned int numElements)
 	{
-		auto vertexArray = std::make_unique<VertexArray>(numElements);
-		m_vertexArrays.push_back(std::move(vertexArray));
-		return *m_vertexArrays.back();
+		return *m_vertexArrays.emplace_back(new VertexArray(numElements));
 	}
 
 	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<float>& data)
 	{
-		auto vertexBuffer = std::make_unique<VertexBuffer>(data);
-		m_vertexBuffers.push_back(std::move(vertexBuffer));
-		return *m_vertexBuffers.back();
+		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
 	}
 
 	IndexBuffer& RenderingContext::createIndexBuffer(const std::vector<unsigned int>& data)
 	{
-		auto indexBuffer = std::make_unique<IndexBuffer>(data);
-		m_indexBuffers.push_back(std::move(indexBuffer));
-		return *m_indexBuffers.back();
+		return *m_indexBuffers.emplace_back(new IndexBuffer(data));
 	}
 
 	Shader& RenderingContext::createShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
 	{
-		auto shader = std::make_unique<Shader>(vertexShaderFile, fragmentShaderFile);
-		m_shaders.push_back(std::move(shader));
-		return *m_shaders.back();
+		return *m_shaders.emplace_back(new Shader(vertexShaderFile, fragmentShaderFile));
 	}
 }

@@ -16,13 +16,18 @@ namespace sbx
 
 	class VertexArray
 	{
+		friend class RenderingContext;
+
+		VertexArray(const VertexArray&) = delete;
+		VertexArray& operator=(const VertexArray&) = delete;
+
 	private:
 		unsigned int m_id;
 		unsigned int m_numElements;
 		bool m_hasIndexBuffer;
 
-	public:
 		VertexArray(unsigned int numElements);
+	public:
 		~VertexArray();
 
 		unsigned int getNumElements() const { return m_numElements; }

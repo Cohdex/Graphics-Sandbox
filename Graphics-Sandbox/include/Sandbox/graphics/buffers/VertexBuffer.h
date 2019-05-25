@@ -6,11 +6,16 @@ namespace sbx
 {
 	class VertexBuffer
 	{
+		friend class RenderingContext;
+
+		VertexBuffer(const VertexBuffer&) = delete;
+		VertexBuffer& operator=(const VertexBuffer&) = delete;
+
 	private:
 		unsigned int m_id;
 
-	public:
 		VertexBuffer(const std::vector<float>& data);
+	public:
 		~VertexBuffer();
 
 		void bind() const;
