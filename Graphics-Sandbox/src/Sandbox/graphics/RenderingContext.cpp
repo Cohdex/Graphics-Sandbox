@@ -20,6 +20,7 @@ namespace sbx
 		m_vertexArrays.clear();
 		m_vertexBuffers.clear();
 		m_indexBuffers.clear();
+		m_shaders.clear();
 		glfwTerminate();
 	}
 
@@ -86,5 +87,12 @@ namespace sbx
 		auto indexBuffer = std::make_unique<IndexBuffer>(data);
 		m_indexBuffers.push_back(std::move(indexBuffer));
 		return *m_indexBuffers.back();
+	}
+
+	Shader& RenderingContext::createShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
+	{
+		auto shader = std::make_unique<Shader>(vertexShaderFile, fragmentShaderFile);
+		m_shaders.push_back(std::move(shader));
+		return *m_shaders.back();
 	}
 }

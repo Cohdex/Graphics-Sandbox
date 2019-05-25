@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "buffers/VertexArray.h"
+#include "Shader.h"
 
 namespace sbx
 {
@@ -18,6 +19,7 @@ namespace sbx
 		std::vector<std::unique_ptr<VertexArray>> m_vertexArrays;
 		std::vector<std::unique_ptr<VertexBuffer>> m_vertexBuffers;
 		std::vector<std::unique_ptr<IndexBuffer>> m_indexBuffers;
+		std::vector<std::unique_ptr<Shader>> m_shaders;
 
 		void init(int screenWidth, int screenHeight);
 
@@ -32,5 +34,7 @@ namespace sbx
 		VertexArray& createVertexArray(unsigned int numElements);
 		VertexBuffer& createVertexBuffer(const std::vector<float>& data);
 		IndexBuffer& createIndexBuffer(const std::vector<unsigned int>& data);
+
+		Shader& createShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile);
 	};
 }
