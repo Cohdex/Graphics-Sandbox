@@ -1,6 +1,6 @@
-#include <pch.h>
+#include "pch.h"
 
-#include "IndexBuffer.h"
+#include <Sandbox/graphics/buffers/IndexBuffer.h>
 
 #include <glad/glad.h>
 

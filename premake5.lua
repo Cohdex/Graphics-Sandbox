@@ -16,15 +16,17 @@ project "Graphics-Sandbox"
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "pch.h"
-	pchsource "Graphics-Sandbox/src/pch.cpp"
+	pchsource "%{prj.name}/src/pch/pch.cpp"
 
 	files {
+		"%{prj.name}/include/**.h",
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
 	}
 
 	includedirs {
-		"%{prj.name}/src/",
+		"%{prj.name}/src/pch/",
+		"%{prj.name}/include/",
 		"%{prj.name}/extlib/GLFW/include/",
 		"%{prj.name}/extlib/GLM/include/"
 	}

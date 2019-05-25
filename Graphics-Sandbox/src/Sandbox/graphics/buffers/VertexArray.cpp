@@ -1,6 +1,6 @@
-#include <pch.h>
+#include "pch.h"
 
-#include "VertexArray.h"
+#include <Sandbox/graphics/buffers/VertexArray.h>
 
 #include <glad/glad.h>
 
