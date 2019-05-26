@@ -1,19 +1,10 @@
 #pragma once
 
-#include <vector>
-
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
 namespace sbx
 {
-	struct VertexAttribute
-	{
-		int index;
-		int size;
-		size_t offset;
-	};
-
 	class VertexArray
 	{
 		friend class RenderingContext;
@@ -33,7 +24,7 @@ namespace sbx
 		unsigned int getNumElements() const { return m_numElements; }
 		bool hasIndexBuffer() const { return m_hasIndexBuffer; }
 
-		void bindVertexBuffer(const VertexBuffer& vertexBuffer, std::vector<VertexAttribute> vertexAttribs);
+		void bindVertexBuffer(const VertexBuffer& vertexBuffer, int index, int size);
 		void bindIndexBuffer(const IndexBuffer& indexBuffer);
 
 		void bind() const;

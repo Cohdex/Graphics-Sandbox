@@ -64,10 +64,14 @@ namespace sbx
 			throw;
 		}
 
+		glViewport(0, 0, screenWidth, screenHeight);
+
+#ifdef GLAD_DEBUG
 		glad_set_pre_callback(glad_pre_callback);
 		glad_set_post_callback(glad_post_callback);
+#endif
 
-		std::cout << "OpenGL version: " << GLVersion.major << "." << GLVersion.minor << std::endl;
+		std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 	}
 
 	RenderingContext::~RenderingContext()
@@ -86,8 +90,8 @@ namespace sbx
 
 	void RenderingContext::update()
 	{
-		glfwPollEvents();
 		glfwSwapBuffers(m_window);
+		glfwPollEvents();
 	}
 
 	VertexArray& RenderingContext::createVertexArray(unsigned int numElements)

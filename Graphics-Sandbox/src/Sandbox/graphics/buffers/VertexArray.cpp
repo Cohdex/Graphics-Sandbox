@@ -17,15 +17,12 @@ namespace sbx
 		glDeleteVertexArrays(1, &m_id);
 	}
 
-	void VertexArray::bindVertexBuffer(const VertexBuffer& vertexBuffer, std::vector<VertexAttribute> vertexAttribs)
+	void VertexArray::bindVertexBuffer(const VertexBuffer& vertexBuffer, int index, int size)
 	{
 		bind();
 		vertexBuffer.bind();
-		for (auto attrib : vertexAttribs)
-		{
-			glVertexAttribPointer(attrib.index, attrib.size, GL_FLOAT, GL_FALSE, attrib.size * sizeof(float), reinterpret_cast<void*>(attrib.offset));
-			glEnableVertexAttribArray(attrib.index);
-		}
+		glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, size * sizeof(float), static_cast<void*>(0));
+		glEnableVertexAttribArray(index);
 	}
 
 	void VertexArray::bindIndexBuffer(const IndexBuffer& indexBuffer)
