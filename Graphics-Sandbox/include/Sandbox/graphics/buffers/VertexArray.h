@@ -24,7 +24,7 @@ namespace sbx
 		unsigned int getNumElements() const { return m_numElements; }
 		bool hasIndexBuffer() const { return m_hasIndexBuffer; }
 
-		void bindVertexBuffer(const VertexBuffer& vertexBuffer, int index, int size);
+		void bindVertexBuffer(const VertexBuffer& vertexBuffer, int index);
 		void bindIndexBuffer(const IndexBuffer& indexBuffer);
 
 		void bind() const;

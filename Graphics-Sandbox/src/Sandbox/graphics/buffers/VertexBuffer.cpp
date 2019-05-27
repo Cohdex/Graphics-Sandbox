@@ -3,14 +3,35 @@
 #include <Sandbox/graphics/buffers/VertexBuffer.h>
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace sbx
 {
-	VertexBuffer::VertexBuffer(const std::vector<float>& data)
+	static inline unsigned int createBuffer(const float* data, size_t dataSize)
 	{
-		glGenBuffers(1, &m_id);
-		glBindBuffer(GL_ARRAY_BUFFER, m_id);
-		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+		unsigned int id;
+		glGenBuffers(1, &id);
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+		glBufferData(GL_ARRAY_BUFFER, dataSize * sizeof(float), data, GL_STATIC_DRAW);
+		return id;
+	}
+
+	VertexBuffer::VertexBuffer(const std::vector<glm::vec2>& data)
+		: m_elementSize(2)
+	{
+		m_id = createBuffer(glm::value_ptr(data[0]), data.size() * m_elementSize);
+	}
+
+	VertexBuffer::VertexBuffer(const std::vector<glm::vec3>& data)
+		: m_elementSize(3)
+	{
+		m_id = createBuffer(glm::value_ptr(data[0]), data.size() * m_elementSize);
+	}
+
+	VertexBuffer::VertexBuffer(const std::vector<glm::vec4>& data)
+		: m_elementSize(4)
+	{
+		m_id = createBuffer(glm::value_ptr(data[0]), data.size() * m_elementSize);
 	}
 
 	VertexBuffer::~VertexBuffer()

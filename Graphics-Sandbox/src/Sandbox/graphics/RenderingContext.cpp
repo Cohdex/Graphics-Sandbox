@@ -33,6 +33,11 @@ namespace sbx
 		}
 	}
 
+	static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height)
+	{
+		glViewport(0, 0, width, height);
+	}
+
 	RenderingContext::RenderingContext(int screenWidth, int screenHeight)
 		: m_window(nullptr)
 	{
@@ -65,6 +70,7 @@ namespace sbx
 		}
 
 		glViewport(0, 0, screenWidth, screenHeight);
+		glfwSetFramebufferSizeCallback(m_window, glfw_framebuffer_size_callback);
 
 #ifdef GLAD_DEBUG
 		glad_set_pre_callback(glad_pre_callback);
@@ -99,7 +105,17 @@ namespace sbx
 		return *m_vertexArrays.emplace_back(new VertexArray(numElements));
 	}
 
-	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<float>& data)
+	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<glm::vec2>& data)
+	{
+		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
+	}
+
+	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<glm::vec3>& data)
+	{
+		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
+	}
+
+	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<glm::vec4>& data)
 	{
 		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
 	}

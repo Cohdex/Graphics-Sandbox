@@ -30,7 +30,9 @@ namespace sbx
 		void update();
 
 		VertexArray& createVertexArray(unsigned int numElements);
-		VertexBuffer& createVertexBuffer(const std::vector<float>& data);
+		VertexBuffer& createVertexBuffer(const std::vector<glm::vec2>& data);
+		VertexBuffer& createVertexBuffer(const std::vector<glm::vec3>& data);
+		VertexBuffer& createVertexBuffer(const std::vector<glm::vec4>& data);
 		IndexBuffer& createIndexBuffer(const std::vector<unsigned int>& data);
 
 		Shader& createShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile);
