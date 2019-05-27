@@ -6,6 +6,8 @@
 #include <fstream>
 #include <streambuf>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace sbx
 {
 	static inline unsigned int compileShader(const char* source, unsigned int shaderType)
@@ -82,5 +84,35 @@ namespace sbx
 	void Shader::bind()
 	{
 		glUseProgram(m_id);
+	}
+
+	static inline int getUniformLocation(unsigned int programId, const std::string& name)
+	{
+		return glGetUniformLocation(programId, name.c_str());
+	}
+
+	void Shader::setUniform(const std::string& name, float value)
+	{
+		glUniform1fv(getUniformLocation(m_id, name), 1, &value);
+	}
+
+	void Shader::setUniform(const std::string& name, glm::vec2 value)
+	{
+		glUniform2fv(getUniformLocation(m_id, name), 1, glm::value_ptr(value));
+	}
+
+	void Shader::setUniform(const std::string& name, glm::vec3 value)
+	{
+		glUniform3fv(getUniformLocation(m_id, name), 1, glm::value_ptr(value));
+	}
+
+	void Shader::setUniform(const std::string& name, glm::vec4 value)
+	{
+		glUniform4fv(getUniformLocation(m_id, name), 1, glm::value_ptr(value));
+	}
+
+	void Shader::setUniform(const std::string& name, glm::mat4 value)
+	{
+		glUniformMatrix4fv(getUniformLocation(m_id, name), 1, GL_FALSE, glm::value_ptr(value));
 	}
 }

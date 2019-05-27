@@ -52,6 +52,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		shader.bind();
+		shader.setUniform("time", static_cast<float>(glfwGetTime()));
 
 		vao.bind();
 		if (vao.hasIndexBuffer())
