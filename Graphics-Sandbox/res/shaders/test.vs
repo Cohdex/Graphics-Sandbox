@@ -10,9 +10,14 @@ out VS_OUT
 	vec2 barycentric;
 } vs_out;
 
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform mat4 u_model;
+
 void main()
 {
-	gl_Position = vec4(in_position, 1.0);
+	mat4 mvp = u_projection * u_view * u_model;
+	gl_Position = mvp * vec4(in_position, 1.0);
 	vs_out.color = in_color;
 	vs_out.barycentric = in_barycentric;
 }

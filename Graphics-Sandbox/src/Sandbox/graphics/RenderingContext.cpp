@@ -100,6 +100,27 @@ namespace sbx
 		glfwPollEvents();
 	}
 
+	int RenderingContext::getWidth() const
+	{
+		int width;
+		glfwGetFramebufferSize(m_window, &width, nullptr);
+		return width;
+	}
+
+	int RenderingContext::getHeight() const
+	{
+		int height;
+		glfwGetFramebufferSize(m_window, nullptr, &height);
+		return height;
+	}
+
+	float RenderingContext::getAspectRatio() const
+	{
+		int width, height;
+		glfwGetFramebufferSize(m_window, &width, &height);
+		return (float)width / (float)height;
+	}
+
 	VertexArray& RenderingContext::createVertexArray(unsigned int numElements)
 	{
 		return *m_vertexArrays.emplace_back(new VertexArray(numElements));
