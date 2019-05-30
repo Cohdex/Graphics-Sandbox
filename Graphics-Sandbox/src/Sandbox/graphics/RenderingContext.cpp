@@ -52,6 +52,7 @@ namespace sbx
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_SAMPLES, 4);
 		m_window = glfwCreateWindow(screenWidth, screenHeight, "Hello world!", nullptr, nullptr);
 		if (m_window == nullptr)
 		{
@@ -69,6 +70,7 @@ namespace sbx
 			throw;
 		}
 
+		glEnable(GL_MULTISAMPLE);
 		glViewport(0, 0, screenWidth, screenHeight);
 		glfwSetFramebufferSizeCallback(m_window, glfw_framebuffer_size_callback);
 
@@ -119,6 +121,11 @@ namespace sbx
 		int width, height;
 		glfwGetFramebufferSize(m_window, &width, &height);
 		return (float)width / (float)height;
+	}
+
+	bool RenderingContext::isKeyDown(int keyCode) const
+	{
+		return glfwGetKey(m_window, keyCode) == GLFW_PRESS;
 	}
 
 	VertexArray& RenderingContext::createVertexArray(unsigned int numElements)

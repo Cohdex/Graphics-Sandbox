@@ -33,6 +33,8 @@ namespace sbx
 		int getHeight() const;
 		float getAspectRatio() const;
 
+		bool isKeyDown(int keyCode) const;
+
 		VertexArray& createVertexArray(unsigned int numElements);
 		VertexBuffer& createVertexBuffer(const std::vector<glm::vec2>& data);
 		VertexBuffer& createVertexBuffer(const std::vector<glm::vec3>& data);

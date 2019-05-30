@@ -7,7 +7,7 @@ int main() {
 	std::unique_ptr<sbx::RenderingContext> renderingContext = std::make_unique<sbx::RenderingContext>(1920, 1080);
 
 	sbx::Camera camera(glm::vec3(), 0.0f, 0.0f);
-	camera.setFov(90.0f);
+	camera.setFov(70.0f);
 	camera.setAspectRatio(renderingContext->getAspectRatio());
 
 	sbx::Shader& shader = renderingContext->createShader("res/shaders/test.vs", "res/shaders/test.fs");
@@ -49,16 +49,46 @@ int main() {
 	sbx::IndexBuffer& ibo = renderingContext->createIndexBuffer(indices);
 	vao.bindIndexBuffer(ibo);
 
+	glDisable(GL_CULL_FACE);
+
 	double lastTime = glfwGetTime();
-	while (renderingContext->running())
+	while (renderingContext->running() && !renderingContext->isKeyDown(GLFW_KEY_ESCAPE))
 	{
 		double currentTime = glfwGetTime();
-		double deltaTime = currentTime - lastTime;
+		float deltaTime = (float)(currentTime - lastTime);
 		lastTime = currentTime;
 
 		renderingContext->update();
 
-		camera.position() += camera.getForward() * (float)deltaTime * 0.1f;
+		float pitchRotation = 0.0f;
+		float yawRotation = 0.0f;
+		if (renderingContext->isKeyDown(GLFW_KEY_UP))
+			pitchRotation++;
+		if (renderingContext->isKeyDown(GLFW_KEY_DOWN))
+			pitchRotation--;
+		if (renderingContext->isKeyDown(GLFW_KEY_RIGHT))
+			yawRotation++;
+		if (renderingContext->isKeyDown(GLFW_KEY_LEFT))
+			yawRotation--;
+
+		float rotationSpeed = 50.0f;
+		camera.setPitch(glm::mod(camera.getPitch() + deltaTime * rotationSpeed * pitchRotation, 360.0f));
+		camera.setYaw(glm::mod(camera.getYaw() + deltaTime * rotationSpeed * yawRotation, 360.0f));
+
+		float forwardMovement = 0.0f;
+		float sideMovement = 0.0f;
+		if (renderingContext->isKeyDown(GLFW_KEY_W))
+			forwardMovement++;
+		if (renderingContext->isKeyDown(GLFW_KEY_S))
+			forwardMovement--;
+		if (renderingContext->isKeyDown(GLFW_KEY_D))
+			sideMovement++;
+		if (renderingContext->isKeyDown(GLFW_KEY_A))
+			sideMovement--;
+
+		float moveSpeed = 0.5f;
+		camera.position() += camera.getForward() * deltaTime * moveSpeed * forwardMovement;
+		camera.position() += camera.getRight() * deltaTime * moveSpeed * sideMovement;
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);

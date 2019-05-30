@@ -41,7 +41,7 @@ namespace sbx
 		viewMatrix[1] = glm::vec4(m_up, 0);
 		viewMatrix[2] = glm::vec4(-m_forward, 0);
 		viewMatrix = glm::transpose(viewMatrix);
-		viewMatrix = glm::translate(viewMatrix, m_position);
+		viewMatrix = glm::translate(viewMatrix, -m_position);
 
 		return viewMatrix;
 	}
