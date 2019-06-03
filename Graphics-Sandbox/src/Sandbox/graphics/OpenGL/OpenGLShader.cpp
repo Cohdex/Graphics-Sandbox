@@ -48,8 +48,8 @@ namespace sbx
 	{
 		m_id = glCreateProgram();
 
-		unsigned int vertexShader = compileShader(readShaderSource(vertexShaderFile).c_str(), GL_VERTEX_SHADER);
-		unsigned int fragmentShader = compileShader(readShaderSource(fragmentShaderFile).c_str(), GL_FRAGMENT_SHADER);
+		uint32_t vertexShader = compileShader(readShaderSource(vertexShaderFile).c_str(), GL_VERTEX_SHADER);
+		uint32_t fragmentShader = compileShader(readShaderSource(fragmentShaderFile).c_str(), GL_FRAGMENT_SHADER);
 
 		glAttachShader(m_id, vertexShader);
 		glAttachShader(m_id, fragmentShader);
@@ -62,11 +62,11 @@ namespace sbx
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 
-		int success;
+		int32_t success;
 		glGetProgramiv(m_id, GL_LINK_STATUS, &success);
 		if (!success)
 		{
-			int logLength;
+			int32_t logLength;
 			glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &logLength);
 			std::vector<char> log(logLength);
 			glGetProgramInfoLog(m_id, logLength, nullptr, log.data());

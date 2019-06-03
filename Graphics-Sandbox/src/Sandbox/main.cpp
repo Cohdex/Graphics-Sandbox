@@ -7,8 +7,6 @@
 
 #include <cinttypes>
 
-#include <glm/gtc/type_ptr.hpp>
-
 int main() {
 	std::unique_ptr<sbx::RenderingContext> renderingContext(new sbx::RenderingContext(1920, 1080));
 
@@ -43,13 +41,13 @@ int main() {
 
 	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(6));
 
-	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(glm::value_ptr(vertices[0]), vertices.size()));
+	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(vertices.data()), vertices.size() * 3));
 	vao->bindVertexBuffer(*positionBuffer, 0, 3);
 
-	std::unique_ptr<sbx::VertexBuffer> colorBuffer(sbx::VertexBuffer::create(glm::value_ptr(colors[0]), colors.size()));
+	std::unique_ptr<sbx::VertexBuffer> colorBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(colors.data()), colors.size() * 3));
 	vao->bindVertexBuffer(*colorBuffer, 1, 3);
 
-	std::unique_ptr<sbx::VertexBuffer> barycentricBuffer(sbx::VertexBuffer::create(glm::value_ptr(barycentrics[0]), barycentrics.size()));
+	std::unique_ptr<sbx::VertexBuffer> barycentricBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(barycentrics.data()), barycentrics.size() * 2));
 	vao->bindVertexBuffer(*barycentricBuffer, 2, 2);
 
 	std::unique_ptr<sbx::IndexBuffer> ibo(sbx::IndexBuffer::create(indices.data(), indices.size()));
@@ -60,9 +58,14 @@ int main() {
 	double lastTime = glfwGetTime();
 	while (renderingContext->running() && !renderingContext->isKeyDown(GLFW_KEY_ESCAPE))
 	{
-		double currentTime = glfwGetTime();
-		float deltaTime = (float)(currentTime - lastTime);
-		lastTime = currentTime;
+		float time;
+		float deltaTime;
+		{
+			double currentTime = glfwGetTime();
+			time = static_cast<float>(currentTime);
+			deltaTime = static_cast<float>(currentTime - lastTime);
+			lastTime = currentTime;
+		}
 
 		renderingContext->update();
 
@@ -102,7 +105,7 @@ int main() {
 		shader->bind();
 		shader->setUniform("u_projection", camera.getProjectionMatrix());
 		shader->setUniform("u_view", camera.getViewMatrix());
-		shader->setUniform("time", static_cast<float>(glfwGetTime()));
+		shader->setUniform("u_time", time);
 
 		shader->setUniform("u_model", glm::mat4(1.0f));
 		vao->bind();
@@ -111,8 +114,6 @@ int main() {
 		else
 			glDrawArrays(GL_TRIANGLES, 0, vao->getNumElements());
 	}
-
-	renderingContext.reset(nullptr);
 
 	return 0;
 }

@@ -8,7 +8,7 @@ in VS_OUT
 
 out vec4 fragColor;
 
-uniform float time;
+uniform float u_time;
 
 void main()
 {
@@ -20,7 +20,7 @@ void main()
 	vec3 bottomColor = mix(bottomLeftColor, bottomRightColor, smoothstep(0.0, 1.0, fs_in.barycentric.x * 0.5 + 0.5));
 	vec3 topColor = mix(topLeftColor, topRightColor, smoothstep(0.0, 1.0, fs_in.barycentric.x * 0.5 + 0.5));
 
-	vec3 color = mix(bottomColor, topColor, smoothstep(0.0, 1.0, fs_in.barycentric.y * 0.5 + 0.5 + sin(time) * 0.5));
+	vec3 color = mix(bottomColor, topColor, smoothstep(0.0, 1.0, fs_in.barycentric.y * 0.5 + 0.5 + sin(u_time) * 0.5));
 
 	fragColor = vec4(pow(color, vec3(1.0 / 2.2)), 1.0);
 }
