@@ -17,29 +17,87 @@ int main() {
 	std::unique_ptr<sbx::Shader> shader(sbx::Shader::create("res/shaders/test.vs", "res/shaders/test.fs"));
 
 	std::vector<glm::vec3> vertices = {
-		{ -0.5f, -0.5f, 0.0f },
-		{ 0.5f, -0.5f, 0.0f },
-		{ 0.5f, 0.5f, 0.0f },
-		{ -0.5f, 0.5f, 0.0f }
+		// Front
+		{ -0.5f, -0.5f, 0.5f },
+		{ 0.5f, -0.5f, 0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+		{ -0.5f, 0.5f, 0.5f },
+		// Back
+		{ -0.5f, -0.5f, -0.5f },
+		{ 0.5f, -0.5f, -0.5f },
+		{ 0.5f, 0.5f, -0.5f },
+		{ -0.5f, 0.5f, -0.5f },
+		// Right
+		{ 0.5f, -0.5f, 0.5f },
+		{ 0.5f, -0.5f, -0.5f },
+		{ 0.5f, 0.5f, -0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+		// Left
+		{ -0.5f, -0.5f, -0.5f },
+		{ -0.5f, -0.5f, 0.5f },
+		{ -0.5f, 0.5f, 0.5f },
+		{ -0.5f, 0.5f, -0.5f }
 	};
 	std::vector<glm::vec3> colors = {
+		// Front
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		// Back
+		{ 1.0f, 1.0f, 1.0f },
+		{ 0.0f, 1.0f, 0.5f },
+		{ 0.0f, 0.5f, 1.0f },
+		{ 0.5f, 0.5f, 1.0f },
+		// Right
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		// Left
 		{ 1.0f, 0.0f, 0.0f },
 		{ 0.0f, 1.0f, 0.0f },
 		{ 0.0f, 0.0f, 1.0f },
 		{ 1.0f, 1.0f, 0.0f }
 	};
 	std::vector<glm::vec2> barycentrics = {
+		// Front
+		{ -1.0f, -1.0f },
+		{ 1.0f, -1.0f },
+		{ 1.0f, 1.0f },
+		{ -1.0f, 1.0f },
+		// Back
+		{ -1.0f, -1.0f },
+		{ 1.0f, -1.0f },
+		{ 1.0f, 1.0f },
+		{ -1.0f, 1.0f },
+		// Right
+		{ -1.0f, -1.0f },
+		{ 1.0f, -1.0f },
+		{ 1.0f, 1.0f },
+		{ -1.0f, 1.0f },
+		// Left
 		{ -1.0f, -1.0f },
 		{ 1.0f, -1.0f },
 		{ 1.0f, 1.0f },
 		{ -1.0f, 1.0f }
 	};
 	std::vector<uint32_t> indices = {
+		// Front
 		0, 1, 2,
-		0, 2, 3
+		0, 2, 3,
+		// Back
+		4, 5, 6,
+		4, 6, 7,
+		// Right
+		8, 9, 10,
+		8, 10, 11,
+		// Left
+		12, 13, 14,
+		12, 14, 15
 	};
 
-	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(6));
+	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(6 * 4));
 
 	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(vertices.data()), vertices.size() * 3));
 	vao->bindVertexBuffer(*positionBuffer, 0, 3);
@@ -53,7 +111,7 @@ int main() {
 	std::unique_ptr<sbx::IndexBuffer> ibo(sbx::IndexBuffer::create(indices.data(), indices.size()));
 	vao->bindIndexBuffer(*ibo);
 
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
 	double lastTime = glfwGetTime();
 	while (renderingContext->running() && !renderingContext->isKeyDown(GLFW_KEY_ESCAPE))
@@ -81,11 +139,12 @@ int main() {
 			yawRotation--;
 
 		float rotationSpeed = 50.0f;
-		camera.setPitch(glm::mod(camera.getPitch() + deltaTime * rotationSpeed * pitchRotation, 360.0f));
-		camera.setYaw(glm::mod(camera.getYaw() + deltaTime * rotationSpeed * yawRotation, 360.0f));
+		camera.setPitch(camera.getPitch() + deltaTime * rotationSpeed * pitchRotation);
+		camera.setYaw(camera.getYaw() + deltaTime * rotationSpeed * yawRotation);
 
 		float forwardMovement = 0.0f;
 		float sideMovement = 0.0f;
+		float verticalMovement = 0.0f;
 		if (renderingContext->isKeyDown(GLFW_KEY_W))
 			forwardMovement++;
 		if (renderingContext->isKeyDown(GLFW_KEY_S))
@@ -94,13 +153,18 @@ int main() {
 			sideMovement++;
 		if (renderingContext->isKeyDown(GLFW_KEY_A))
 			sideMovement--;
+		if (renderingContext->isKeyDown(GLFW_KEY_SPACE))
+			verticalMovement++;
+		if (renderingContext->isKeyDown(GLFW_KEY_LEFT_ALT))
+			verticalMovement--;
 
 		float moveSpeed = 0.5f;
 		camera.position() += camera.getForward() * deltaTime * moveSpeed * forwardMovement;
 		camera.position() += camera.getRight() * deltaTime * moveSpeed * sideMovement;
+		camera.position() += camera.getUp() * deltaTime * moveSpeed * verticalMovement;
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		shader->bind();
 		shader->setUniform("u_projection", camera.getProjectionMatrix());

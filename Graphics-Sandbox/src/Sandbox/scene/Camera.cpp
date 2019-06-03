@@ -14,13 +14,13 @@ namespace sbx
 
 	void Camera::setYaw(float yaw)
 	{
-		m_yaw = yaw;
+		m_yaw = glm::mod(yaw, 360.0f);
 		recalculateVectors();
 	}
 
 	void Camera::setPitch(float pitch)
 	{
-		m_pitch = pitch;
+		m_pitch = glm::clamp(pitch, -89.99f, 89.99f);
 		recalculateVectors();
 	}
 
@@ -36,7 +36,7 @@ namespace sbx
 
 	glm::mat4 Camera::getViewMatrix() const
 	{
-		glm::mat4 viewMatrix;
+		glm::mat4 viewMatrix(1.0f);
 		viewMatrix[0] = glm::vec4(m_right, 0);
 		viewMatrix[1] = glm::vec4(m_up, 0);
 		viewMatrix[2] = glm::vec4(-m_forward, 0);
