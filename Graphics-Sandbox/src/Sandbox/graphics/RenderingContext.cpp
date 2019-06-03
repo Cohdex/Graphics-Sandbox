@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include <Sandbox/graphics/RenderingContext.h>
 
 namespace sbx
@@ -84,10 +83,6 @@ namespace sbx
 
 	RenderingContext::~RenderingContext()
 	{
-		m_vertexArrays.clear();
-		m_vertexBuffers.clear();
-		m_indexBuffers.clear();
-		m_shaders.clear();
 		glfwTerminate();
 	}
 
@@ -126,35 +121,5 @@ namespace sbx
 	bool RenderingContext::isKeyDown(int keyCode) const
 	{
 		return glfwGetKey(m_window, keyCode) == GLFW_PRESS;
-	}
-
-	VertexArray& RenderingContext::createVertexArray(unsigned int numElements)
-	{
-		return *m_vertexArrays.emplace_back(new VertexArray(numElements));
-	}
-
-	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<glm::vec2>& data)
-	{
-		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
-	}
-
-	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<glm::vec3>& data)
-	{
-		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
-	}
-
-	VertexBuffer& RenderingContext::createVertexBuffer(const std::vector<glm::vec4>& data)
-	{
-		return *m_vertexBuffers.emplace_back(new VertexBuffer(data));
-	}
-
-	IndexBuffer& RenderingContext::createIndexBuffer(const std::vector<unsigned int>& data)
-	{
-		return *m_indexBuffers.emplace_back(new IndexBuffer(data));
-	}
-
-	Shader& RenderingContext::createShader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
-	{
-		return *m_shaders.emplace_back(new Shader(vertexShaderFile, fragmentShaderFile));
 	}
 }
