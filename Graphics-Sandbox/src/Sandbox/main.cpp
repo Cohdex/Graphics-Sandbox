@@ -6,6 +6,7 @@
 #include <Sandbox/scene/Camera.h>
 
 #include <cinttypes>
+#include <random>
 
 int main() {
 	std::unique_ptr<sbx::RenderingContext> renderingContext(new sbx::RenderingContext(1920, 1080));
@@ -23,10 +24,10 @@ int main() {
 		{ 0.5f, 0.5f, 0.5f },
 		{ -0.5f, 0.5f, 0.5f },
 		// Back
-		{ -0.5f, -0.5f, -0.5f },
 		{ 0.5f, -0.5f, -0.5f },
-		{ 0.5f, 0.5f, -0.5f },
+		{ -0.5f, -0.5f, -0.5f },
 		{ -0.5f, 0.5f, -0.5f },
+		{ 0.5f, 0.5f, -0.5f },
 		// Right
 		{ 0.5f, -0.5f, 0.5f },
 		{ 0.5f, -0.5f, -0.5f },
@@ -36,9 +37,28 @@ int main() {
 		{ -0.5f, -0.5f, -0.5f },
 		{ -0.5f, -0.5f, 0.5f },
 		{ -0.5f, 0.5f, 0.5f },
-		{ -0.5f, 0.5f, -0.5f }
+		{ -0.5f, 0.5f, -0.5f },
+		// Top
+		{ -0.5f, 0.5f, 0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+		{ 0.5f, 0.5f, -0.5f },
+		{ -0.5f, 0.5f, -0.5f },
+		// Bottom
+		{ -0.5f, -0.5f, -0.5f },
+		{ 0.5f, -0.5f, -0.5f },
+		{ 0.5f, -0.5f, 0.5f },
+		{ -0.5f, -0.5f, 0.5f }
 	};
-	std::vector<glm::vec3> colors = {
+	std::vector<glm::vec3> cornerColors(8);
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+	for (int i = 0; i < 8; i++)
+	{
+		cornerColors[i].x = distribution(generator);
+		cornerColors[i].y = distribution(generator);
+		cornerColors[i].z = distribution(generator);
+	}
+	/*std::vector<glm::vec3> colors = {
 		// Front
 		{ 1.0f, 0.0f, 0.0f },
 		{ 0.0f, 1.0f, 0.0f },
@@ -58,7 +78,49 @@ int main() {
 		{ 1.0f, 0.0f, 0.0f },
 		{ 0.0f, 1.0f, 0.0f },
 		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		// Top
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		// Bottom
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f },
 		{ 1.0f, 1.0f, 0.0f }
+	};*/
+	std::vector<glm::vec3> colors = {
+		// Front
+		cornerColors[0],
+		cornerColors[1],
+		cornerColors[2],
+		cornerColors[3],
+		// Back
+		cornerColors[4],
+		cornerColors[5],
+		cornerColors[6],
+		cornerColors[7],
+		// Right
+		cornerColors[1],
+		cornerColors[4],
+		cornerColors[7],
+		cornerColors[2],
+		// Left
+		cornerColors[5],
+		cornerColors[0],
+		cornerColors[3],
+		cornerColors[6],
+		// Top
+		cornerColors[3],
+		cornerColors[2],
+		cornerColors[7],
+		cornerColors[6],
+		// Bottom
+		cornerColors[5],
+		cornerColors[4],
+		cornerColors[1],
+		cornerColors[0]
 	};
 	std::vector<glm::vec2> barycentrics = {
 		// Front
@@ -80,6 +142,16 @@ int main() {
 		{ -1.0f, -1.0f },
 		{ 1.0f, -1.0f },
 		{ 1.0f, 1.0f },
+		{ -1.0f, 1.0f },
+		// Top
+		{ -1.0f, -1.0f },
+		{ 1.0f, -1.0f },
+		{ 1.0f, 1.0f },
+		{ -1.0f, 1.0f },
+		// Bottom
+		{ -1.0f, -1.0f },
+		{ 1.0f, -1.0f },
+		{ 1.0f, 1.0f },
 		{ -1.0f, 1.0f }
 	};
 	std::vector<uint32_t> indices = {
@@ -94,10 +166,16 @@ int main() {
 		8, 10, 11,
 		// Left
 		12, 13, 14,
-		12, 14, 15
+		12, 14, 15,
+		// Top
+		16, 17, 18,
+		16, 18, 19,
+		// Bottom
+		20, 21, 22,
+		20, 22, 23
 	};
 
-	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(6 * 4));
+	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(indices.size()));
 
 	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(vertices.data()), vertices.size() * 3));
 	vao->bindVertexBuffer(*positionBuffer, 0, 3);
@@ -155,7 +233,7 @@ int main() {
 			sideMovement--;
 		if (renderingContext->isKeyDown(GLFW_KEY_SPACE))
 			verticalMovement++;
-		if (renderingContext->isKeyDown(GLFW_KEY_LEFT_ALT))
+		if (renderingContext->isKeyDown(GLFW_KEY_C))
 			verticalMovement--;
 
 		float moveSpeed = 0.5f;

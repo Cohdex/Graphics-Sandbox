@@ -21,6 +21,10 @@ void main()
 	vec3 topColor = mix(topLeftColor, topRightColor, smoothstep(0.0, 1.0, fs_in.barycentric.x * 0.5 + 0.5));
 
 	vec3 color = mix(bottomColor, topColor, smoothstep(0.0, 1.0, fs_in.barycentric.y * 0.5 + 0.5 + sin(u_time) * 0.5));
+	color = fs_in.color;
+
+	float dist = max(abs(fs_in.barycentric.x), abs(fs_in.barycentric.y));
+	color = mix(color, vec3(0.0), smoothstep(0.95, 0.95 + fwidth(dist), dist));
 
 	fragColor = vec4(pow(color, vec3(1.0 / 2.2)), 1.0);
 }
