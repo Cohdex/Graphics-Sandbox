@@ -17,163 +17,44 @@ int main() {
 
 	std::unique_ptr<sbx::Shader> shader(sbx::Shader::create("res/shaders/test.vs", "res/shaders/test.fs"));
 
-	std::vector<glm::vec3> vertices = {
-		// Front
-		{ -0.5f, -0.5f, 0.5f },
-		{ 0.5f, -0.5f, 0.5f },
-		{ 0.5f, 0.5f, 0.5f },
-		{ -0.5f, 0.5f, 0.5f },
-		// Back
-		{ 0.5f, -0.5f, -0.5f },
-		{ -0.5f, -0.5f, -0.5f },
-		{ -0.5f, 0.5f, -0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-		// Right
-		{ 0.5f, -0.5f, 0.5f },
-		{ 0.5f, -0.5f, -0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-		{ 0.5f, 0.5f, 0.5f },
-		// Left
-		{ -0.5f, -0.5f, -0.5f },
-		{ -0.5f, -0.5f, 0.5f },
-		{ -0.5f, 0.5f, 0.5f },
-		{ -0.5f, 0.5f, -0.5f },
-		// Top
-		{ -0.5f, 0.5f, 0.5f },
-		{ 0.5f, 0.5f, 0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-		{ -0.5f, 0.5f, -0.5f },
-		// Bottom
-		{ -0.5f, -0.5f, -0.5f },
-		{ 0.5f, -0.5f, -0.5f },
-		{ 0.5f, -0.5f, 0.5f },
-		{ -0.5f, -0.5f, 0.5f }
-	};
-	std::vector<glm::vec3> cornerColors(8);
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> colors;
+	std::vector<glm::vec2> barycentrics;
+	std::vector<uint32_t> indices;
+
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-	for (int i = 0; i < 8; i++)
+	int size = 100;
+	float scale = 0.1f;
+	for (int z = 0; z < size; z++)
 	{
-		cornerColors[i].x = distribution(generator);
-		cornerColors[i].y = distribution(generator);
-		cornerColors[i].z = distribution(generator);
+		for (int x = 0; x < size; x++)
+		{
+			vertices.emplace_back(x * scale, 0, z * scale);
+			vertices.emplace_back(x * scale, 0, (z + 1) * scale);
+			vertices.emplace_back((x + 1) * scale, 0, (z + 1) * scale);
+			vertices.emplace_back((x + 1) * scale, 0, z * scale);
+
+			glm::vec3 color(distribution(generator), distribution(generator), distribution(generator));
+			colors.push_back(color);
+			colors.push_back(color);
+			colors.push_back(color);
+			colors.push_back(color);
+
+			barycentrics.emplace_back(-1, 1);
+			barycentrics.emplace_back(-1, -1);
+			barycentrics.emplace_back(1, -1);
+			barycentrics.emplace_back(1, 1);
+
+			int baseIndex = (z * size + x) * 4;
+			indices.emplace_back(baseIndex + 0);
+			indices.emplace_back(baseIndex + 1);
+			indices.emplace_back(baseIndex + 2);
+			indices.emplace_back(baseIndex + 2);
+			indices.emplace_back(baseIndex + 3);
+			indices.emplace_back(baseIndex + 0);
+		}
 	}
-	/*std::vector<glm::vec3> colors = {
-		// Front
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 0.0f },
-		// Back
-		{ 1.0f, 1.0f, 1.0f },
-		{ 0.0f, 1.0f, 0.5f },
-		{ 0.0f, 0.5f, 1.0f },
-		{ 0.5f, 0.5f, 1.0f },
-		// Right
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 0.0f },
-		// Left
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 0.0f },
-		// Top
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 0.0f },
-		// Bottom
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 0.0f }
-	};*/
-	std::vector<glm::vec3> colors = {
-		// Front
-		cornerColors[0],
-		cornerColors[1],
-		cornerColors[2],
-		cornerColors[3],
-		// Back
-		cornerColors[4],
-		cornerColors[5],
-		cornerColors[6],
-		cornerColors[7],
-		// Right
-		cornerColors[1],
-		cornerColors[4],
-		cornerColors[7],
-		cornerColors[2],
-		// Left
-		cornerColors[5],
-		cornerColors[0],
-		cornerColors[3],
-		cornerColors[6],
-		// Top
-		cornerColors[3],
-		cornerColors[2],
-		cornerColors[7],
-		cornerColors[6],
-		// Bottom
-		cornerColors[5],
-		cornerColors[4],
-		cornerColors[1],
-		cornerColors[0]
-	};
-	std::vector<glm::vec2> barycentrics = {
-		// Front
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f },
-		// Back
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f },
-		// Right
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f },
-		// Left
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f },
-		// Top
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f },
-		// Bottom
-		{ -1.0f, -1.0f },
-		{ 1.0f, -1.0f },
-		{ 1.0f, 1.0f },
-		{ -1.0f, 1.0f }
-	};
-	std::vector<uint32_t> indices = {
-		// Front
-		0, 1, 2,
-		0, 2, 3,
-		// Back
-		4, 5, 6,
-		4, 6, 7,
-		// Right
-		8, 9, 10,
-		8, 10, 11,
-		// Left
-		12, 13, 14,
-		12, 14, 15,
-		// Top
-		16, 17, 18,
-		16, 18, 19,
-		// Bottom
-		20, 21, 22,
-		20, 22, 23
-	};
 
 	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(indices.size()));
 
@@ -208,38 +89,62 @@ int main() {
 		float pitchRotation = 0.0f;
 		float yawRotation = 0.0f;
 		if (renderingContext->isKeyDown(GLFW_KEY_UP))
+		{
 			pitchRotation++;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_DOWN))
+		{
 			pitchRotation--;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_RIGHT))
+		{
 			yawRotation++;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_LEFT))
+		{
 			yawRotation--;
+		}
 
 		float rotationSpeed = 50.0f;
 		camera.setPitch(camera.getPitch() + deltaTime * rotationSpeed * pitchRotation);
 		camera.setYaw(camera.getYaw() + deltaTime * rotationSpeed * yawRotation);
 
-		float forwardMovement = 0.0f;
-		float sideMovement = 0.0f;
-		float verticalMovement = 0.0f;
+		glm::vec3 movement(0.0f);
 		if (renderingContext->isKeyDown(GLFW_KEY_W))
-			forwardMovement++;
+		{
+			movement.z++;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_S))
-			forwardMovement--;
+		{
+			movement.z--;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_D))
-			sideMovement++;
+		{
+			movement.x++;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_A))
-			sideMovement--;
+		{
+			movement.x--;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_SPACE))
-			verticalMovement++;
+		{
+			movement.y++;
+		}
 		if (renderingContext->isKeyDown(GLFW_KEY_C))
-			verticalMovement--;
+		{
+			movement.y--;
+		}
 
-		float moveSpeed = 0.5f;
-		camera.position() += camera.getForward() * deltaTime * moveSpeed * forwardMovement;
-		camera.position() += camera.getRight() * deltaTime * moveSpeed * sideMovement;
-		camera.position() += camera.getUp() * deltaTime * moveSpeed * verticalMovement;
+		float movementAmplitude = glm::length(movement);
+		if (movementAmplitude > 1.0f)
+		{
+			movement /= movementAmplitude;
+		}
+
+		float moveSpeed = 1.0f;
+		camera.position() += camera.getForward() * deltaTime * moveSpeed * movement.z;
+		camera.position() += camera.getRight() * deltaTime * moveSpeed * movement.x;
+		camera.position() += camera.getUp() * deltaTime * moveSpeed * movement.y;
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -252,9 +157,13 @@ int main() {
 		shader->setUniform("u_model", glm::mat4(1.0f));
 		vao->bind();
 		if (vao->hasIndexBuffer())
+		{
 			glDrawElements(GL_TRIANGLES, vao->getNumElements(), GL_UNSIGNED_INT, nullptr);
+		}
 		else
+		{
 			glDrawArrays(GL_TRIANGLES, 0, vao->getNumElements());
+		}
 	}
 
 	return 0;

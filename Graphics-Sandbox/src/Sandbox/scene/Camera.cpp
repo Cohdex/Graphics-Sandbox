@@ -48,7 +48,7 @@ namespace sbx
 
 	glm::mat4 Camera::getProjectionMatrix() const
 	{
-		return glm::perspective(m_fov, m_aspectRatio, 0.1f, 100.0f);
+		return glm::perspective(m_fov, m_aspectRatio, 0.05f, 500.0f);
 	}
 
 	void Camera::recalculateVectors()
