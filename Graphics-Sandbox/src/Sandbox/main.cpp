@@ -151,6 +151,11 @@ int main() {
 		}
 
 		float moveSpeed = 1.0f;
+		if (renderingContext->isKeyDown(GLFW_KEY_LEFT_SHIFT))
+		{
+			moveSpeed = 2.5f;
+		}
+
 		camera.position() += camera.getForward() * deltaTime * moveSpeed * movement.z;
 		camera.position() += camera.getRight() * deltaTime * moveSpeed * movement.x;
 		camera.position() += camera.getUp() * deltaTime * moveSpeed * movement.y;
