@@ -1,12 +1,13 @@
 #version 330 core
 
 layout(location=0) in vec3 in_position;
-//layout(location=1) in vec3 in_color;
-//layout(location=2) in vec2 in_barycentric;
+layout(location=1) in vec3 in_color;
+layout(location=2) in vec2 in_barycentric;
 
 out VS_OUT
 {
 	vec3 position;
+	vec3 normal;
 	vec3 color;
 	vec2 barycentric;
 } vs_out;
@@ -33,10 +34,20 @@ float noise(vec2 p){
 void main()
 {
 	vec4 worldPos = u_model * vec4(in_position, 1.0);
-	worldPos += noise(worldPos.xz / 1.5) / 1.5;
+
+	worldPos.xyz += noise(worldPos.xz / 1.5) / 1.5;
+	float offset = 0.001;
+	vec3 dx = worldPos.xyz + vec3(offset, 0.0, 0.0);
+	dx += noise(dx.xz / 1.5) / 1.5;
+	vec3 dz = worldPos.xyz + vec3(0.0, 0.0, offset);
+	dz += noise(dz.xz / 1.5) / 1.5;
+
+	vec3 normal = normalize(cross(dz, dx));
+
 	vs_out.position = worldPos.xyz;
-	vs_out.color = vec3(0.5);//in_color;
-	vs_out.barycentric = vec2(0.5);//in_barycentric;
+	vs_out.normal = normal;
+	vs_out.color = in_color;
+	vs_out.barycentric = in_barycentric;
 
 	gl_Position = u_projection * u_view * worldPos;
 }

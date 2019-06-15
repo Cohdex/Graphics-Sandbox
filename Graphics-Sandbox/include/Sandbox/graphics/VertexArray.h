@@ -4,6 +4,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "Shader.h"
 
 namespace sbx
 {
@@ -28,6 +29,6 @@ namespace sbx
 
 		virtual void bind() const = 0;
 
-		static VertexArray* create(uint32_t elementCount);
+		static VertexArray* create(uint32_t elementCount, const Shader& shader);
 	};
 }

@@ -19,8 +19,8 @@ int main() {
 
 	sbx::BufferLayout layout;
 	layout.addVertexAttribute(sbx::VertexDataType::Float3, "in_position");
-	//layout.addVertexAttribute(sbx::VertexDataType::Float3, "in_color");
-	//layout.addVertexAttribute(sbx::VertexDataType::Float2, "in_barycentric");
+	layout.addVertexAttribute(sbx::VertexDataType::Float3, "in_color");
+	layout.addVertexAttribute(sbx::VertexDataType::Float2, "in_barycentric");
 
 	std::vector<float> vertices;
 	std::vector<uint32_t> indices;
@@ -43,23 +43,25 @@ int main() {
 				vertices.emplace_back(z);
 			};
 
-			pushFloat3(x * scale, 0, z * scale);
-			pushFloat3(x * scale, 0, (z + 1) * scale);
-			pushFloat3((x + 1) * scale, 0, (z + 1) * scale);
-			pushFloat3((x + 1) * scale, 0, z * scale);
-
 			glm::vec3 color(distribution(generator), distribution(generator), distribution(generator));
-			//pushFloat3(color.x, color.y, color.z);
-			//pushFloat3(color.x, color.y, color.z);
-			//pushFloat3(color.x, color.y, color.z);
-			//pushFloat3(color.x, color.y, color.z);
 
-			//pushFloat2(-1.0f, -1.0f);
-			//pushFloat2(-1.0f, 1.0f);
-			//pushFloat2(1.0f, 1.0f);
-			//pushFloat2(1.0f, -1.0f);
+			pushFloat3(x * scale, 0, z * scale);
+			pushFloat3(color.x, color.y, color.z);
+			pushFloat2(-1.0f, -1.0f);
 
-			int baseIndex = (z * size + x) * 4;
+			pushFloat3(x * scale, 0, (z + 1) * scale);
+			pushFloat3(color.x, color.y, color.z);
+			pushFloat2(-1.0f, 1.0f);
+			
+			pushFloat3((x + 1) * scale, 0, (z + 1) * scale);
+			pushFloat3(color.x, color.y, color.z);
+			pushFloat2(1.0f, 1.0f);
+			
+			pushFloat3((x + 1) * scale, 0, z * scale);
+			pushFloat3(color.x, color.y, color.z);
+			pushFloat2(1.0f, -1.0f);
+
+			int baseIndex = (x + z * size) * 4;
 			indices.emplace_back(baseIndex + 0);
 			indices.emplace_back(baseIndex + 1);
 			indices.emplace_back(baseIndex + 2);
@@ -69,7 +71,7 @@ int main() {
 		}
 	}
 
-	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(static_cast<uint32_t>(indices.size())));
+	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(static_cast<uint32_t>(indices.size()), *shader));
 
 	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(vertices.data(), vertices.size(), layout));
 	vao->bindVertexBuffer(*positionBuffer);
@@ -78,7 +80,6 @@ int main() {
 	vao->bindIndexBuffer(*ibo);
 
 	glEnable(GL_DEPTH_TEST);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	double lastTime = glfwGetTime();
 	while (renderingContext->running() && !renderingContext->isKeyDown(GLFW_KEY_ESCAPE))
@@ -160,7 +161,6 @@ int main() {
 		shader->bind();
 		shader->setUniform("u_projection", camera.getProjectionMatrix());
 		shader->setUniform("u_view", camera.getViewMatrix());
-		shader->setUniform("u_time", time);
 
 		shader->setUniform("u_model", glm::mat4(1.0f));
 		vao->bind();

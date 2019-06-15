@@ -10,7 +10,7 @@
 
 namespace sbx
 {
-	static inline uint32_t compileShader(const char* source, uint32_t shaderType)
+	static inline uint32_t compileShader(const char* source, uint32_t shaderType, const std::string& filename)
 	{
 		uint32_t shader = glCreateShader(shaderType);
 		glShaderSource(shader, 1, &source, nullptr);
@@ -23,7 +23,7 @@ namespace sbx
 			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 			std::vector<char> log(logLength);
 			glGetShaderInfoLog(shader, logLength, nullptr, log.data());
-			std::cout << "Failed to compile shader: " << log.data() << std::endl;
+			std::cout << "Failed to compile shader " << filename << ":" << std::endl << log.data() << std::endl;
 			glDeleteShader(shader);
 			throw;
 		}
@@ -48,8 +48,8 @@ namespace sbx
 	{
 		m_id = glCreateProgram();
 
-		uint32_t vertexShader = compileShader(readShaderSource(vertexShaderFile).c_str(), GL_VERTEX_SHADER);
-		uint32_t fragmentShader = compileShader(readShaderSource(fragmentShaderFile).c_str(), GL_FRAGMENT_SHADER);
+		uint32_t vertexShader = compileShader(readShaderSource(vertexShaderFile).c_str(), GL_VERTEX_SHADER, vertexShaderFile);
+		uint32_t fragmentShader = compileShader(readShaderSource(fragmentShaderFile).c_str(), GL_FRAGMENT_SHADER, fragmentShaderFile);
 
 		glAttachShader(m_id, vertexShader);
 		glAttachShader(m_id, fragmentShader);

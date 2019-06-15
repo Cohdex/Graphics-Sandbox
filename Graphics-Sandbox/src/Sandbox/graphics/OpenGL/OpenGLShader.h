@@ -16,6 +16,8 @@ namespace sbx
 
 		virtual ~OpenGLShader();
 
+		uint32_t getOpenGLId() const { return m_id; }
+
 		virtual void bind() override;
 
 		virtual void setUniform(const std::string& name, float value) override;

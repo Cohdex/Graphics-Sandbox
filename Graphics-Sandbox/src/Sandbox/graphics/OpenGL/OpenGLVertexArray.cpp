@@ -31,8 +31,8 @@ namespace sbx
 		}
 	}
 
-	OpenGLVertexArray::OpenGLVertexArray(uint32_t elementCount)
-		: VertexArray(elementCount)
+	OpenGLVertexArray::OpenGLVertexArray(uint32_t elementCount, const Shader& shader)
+		: VertexArray(elementCount), m_shader(static_cast<const OpenGLShader&>(shader))
 	{
 		glGenVertexArrays(1, &m_id);
 	}
@@ -48,7 +48,7 @@ namespace sbx
 		vertexBuffer.bind();
 		for (const auto& attribute : vertexBuffer.getBufferLayout())
 		{
-			uint32_t index = getVertexAttributeIndex(m_id, attribute);
+			uint32_t index = getVertexAttributeIndex(m_shader.getOpenGLId(), attribute);
 			int32_t componentCount = attribute.componentCount;
 			uint32_t type = getGLDataType(attribute.dataType);
 			int32_t stride = vertexBuffer.getBufferLayout().getStride();
