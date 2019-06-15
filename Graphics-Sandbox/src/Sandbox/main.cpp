@@ -17,9 +17,12 @@ int main() {
 
 	std::unique_ptr<sbx::Shader> shader(sbx::Shader::create("res/shaders/test.vs", "res/shaders/test.fs"));
 
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> colors;
-	std::vector<glm::vec2> barycentrics;
+	sbx::BufferLayout layout;
+	layout.addVertexAttribute(sbx::VertexDataType::Float3, "in_position");
+	//layout.addVertexAttribute(sbx::VertexDataType::Float3, "in_color");
+	//layout.addVertexAttribute(sbx::VertexDataType::Float2, "in_barycentric");
+
+	std::vector<float> vertices;
 	std::vector<uint32_t> indices;
 
 	std::default_random_engine generator;
@@ -30,21 +33,31 @@ int main() {
 	{
 		for (int x = 0; x < size; x++)
 		{
-			vertices.emplace_back(x * scale, 0, z * scale);
-			vertices.emplace_back(x * scale, 0, (z + 1) * scale);
-			vertices.emplace_back((x + 1) * scale, 0, (z + 1) * scale);
-			vertices.emplace_back((x + 1) * scale, 0, z * scale);
+			auto pushFloat2 = [&vertices](float x, float y) {
+				vertices.emplace_back(x);
+				vertices.emplace_back(y);
+			};
+			auto pushFloat3 = [&vertices](float x, float y, float z) {
+				vertices.emplace_back(x);
+				vertices.emplace_back(y);
+				vertices.emplace_back(z);
+			};
+
+			pushFloat3(x * scale, 0, z * scale);
+			pushFloat3(x * scale, 0, (z + 1) * scale);
+			pushFloat3((x + 1) * scale, 0, (z + 1) * scale);
+			pushFloat3((x + 1) * scale, 0, z * scale);
 
 			glm::vec3 color(distribution(generator), distribution(generator), distribution(generator));
-			colors.push_back(color);
-			colors.push_back(color);
-			colors.push_back(color);
-			colors.push_back(color);
+			//pushFloat3(color.x, color.y, color.z);
+			//pushFloat3(color.x, color.y, color.z);
+			//pushFloat3(color.x, color.y, color.z);
+			//pushFloat3(color.x, color.y, color.z);
 
-			barycentrics.emplace_back(-1, 1);
-			barycentrics.emplace_back(-1, -1);
-			barycentrics.emplace_back(1, -1);
-			barycentrics.emplace_back(1, 1);
+			//pushFloat2(-1.0f, -1.0f);
+			//pushFloat2(-1.0f, 1.0f);
+			//pushFloat2(1.0f, 1.0f);
+			//pushFloat2(1.0f, -1.0f);
 
 			int baseIndex = (z * size + x) * 4;
 			indices.emplace_back(baseIndex + 0);
@@ -56,21 +69,16 @@ int main() {
 		}
 	}
 
-	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(indices.size()));
+	std::unique_ptr<sbx::VertexArray> vao(sbx::VertexArray::create(static_cast<uint32_t>(indices.size())));
 
-	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(vertices.data()), vertices.size() * 3));
-	vao->bindVertexBuffer(*positionBuffer, 0, 3);
-
-	std::unique_ptr<sbx::VertexBuffer> colorBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(colors.data()), colors.size() * 3));
-	vao->bindVertexBuffer(*colorBuffer, 1, 3);
-
-	std::unique_ptr<sbx::VertexBuffer> barycentricBuffer(sbx::VertexBuffer::create(reinterpret_cast<float*>(barycentrics.data()), barycentrics.size() * 2));
-	vao->bindVertexBuffer(*barycentricBuffer, 2, 2);
+	std::unique_ptr<sbx::VertexBuffer> positionBuffer(sbx::VertexBuffer::create(vertices.data(), vertices.size(), layout));
+	vao->bindVertexBuffer(*positionBuffer);
 
 	std::unique_ptr<sbx::IndexBuffer> ibo(sbx::IndexBuffer::create(indices.data(), indices.size()));
 	vao->bindIndexBuffer(*ibo);
 
 	glEnable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	double lastTime = glfwGetTime();
 	while (renderingContext->running() && !renderingContext->isKeyDown(GLFW_KEY_ESCAPE))
@@ -158,11 +166,11 @@ int main() {
 		vao->bind();
 		if (vao->hasIndexBuffer())
 		{
-			glDrawElements(GL_TRIANGLES, vao->getNumElements(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, vao->getElementCount(), GL_UNSIGNED_INT, nullptr);
 		}
 		else
 		{
-			glDrawArrays(GL_TRIANGLES, 0, vao->getNumElements());
+			glDrawArrays(GL_TRIANGLES, 0, vao->getElementCount());
 		}
 	}
 

@@ -1,8 +1,8 @@
 #version 330 core
 
 layout(location=0) in vec3 in_position;
-layout(location=1) in vec3 in_color;
-layout(location=2) in vec2 in_barycentric;
+//layout(location=1) in vec3 in_color;
+//layout(location=2) in vec2 in_barycentric;
 
 out VS_OUT
 {
@@ -35,8 +35,8 @@ void main()
 	vec4 worldPos = u_model * vec4(in_position, 1.0);
 	worldPos += noise(worldPos.xz / 1.5) / 1.5;
 	vs_out.position = worldPos.xyz;
-	vs_out.color = in_color;
-	vs_out.barycentric = in_barycentric;
+	vs_out.color = vec3(0.5);//in_color;
+	vs_out.barycentric = vec2(0.5);//in_barycentric;
 
 	gl_Position = u_projection * u_view * worldPos;
 }

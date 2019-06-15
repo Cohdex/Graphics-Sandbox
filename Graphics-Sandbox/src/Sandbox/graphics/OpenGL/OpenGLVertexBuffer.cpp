@@ -5,7 +5,8 @@
 
 namespace sbx
 {
-	OpenGLVertexBuffer::OpenGLVertexBuffer(const float* vertices, size_t size)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(const float* vertices, size_t size, const BufferLayout& layout)
+		: VertexBuffer(layout)
 	{
 		glGenBuffers(1, &m_id);
 		glBindBuffer(GL_ARRAY_BUFFER, m_id);

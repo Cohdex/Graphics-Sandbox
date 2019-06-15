@@ -10,7 +10,7 @@ namespace sbx
 		uint32_t m_id;
 
 	public:
-		OpenGLVertexBuffer(const float* vertices, size_t size);
+		OpenGLVertexBuffer(const float* vertices, size_t size, const BufferLayout& layout);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void bind() const override;
