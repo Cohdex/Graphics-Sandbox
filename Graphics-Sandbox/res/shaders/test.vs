@@ -41,7 +41,7 @@ void main()
 {
 	vec4 worldPos = u_model * vec4(in_position, 1.0);
 
-	worldPos.y += noise(worldPos.xz / 1.5) / 1.5;
+	//worldPos.y += noise(worldPos.xz / 1.5) / 1.5;
 	float offset = 0.001;
 	vec3 dx = worldPos.xyz + vec3(offset, 0.0, 0.0);
 	dx.y += noise(dx.xz / 1.5) / 1.5;

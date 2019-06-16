@@ -5,10 +5,10 @@
 #include <Sandbox/graphics/Shader.h>
 #include <Sandbox/graphics/Texture.h>
 #include <Sandbox/scene/Camera.h>
+#include <Sandbox/util/Noise.h>
 
 #include <cinttypes>
 #include <random>
-
 #include <map>
 
 int main() {
@@ -36,6 +36,7 @@ int main() {
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 	std::map<uint64_t, glm::vec3> colorMap;
+	sbx::PerlinNoise perlinNoise;
 	uint32_t size = 100;
 	float scale = 0.1f;
 	for (uint32_t z = 0; z < size; z++)
@@ -94,28 +95,28 @@ int main() {
 			colorLL = getColor(createKey(x0, z1));
 			colorLR = getColor(createKey(x1, z1));
 
-			pushFloat3(x0 * scale, 0, z0 * scale);
+			pushFloat3(x0 * scale, perlinNoise(x0 * scale, z0 * scale), z0 * scale);
 			pushFloat2(0.0f, 0.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
 			pushVec3(colorLL);
 			pushVec3(colorLR);
 
-			pushFloat3(x0 * scale, 0, z1 * scale);
+			pushFloat3(x0 * scale, perlinNoise(x0 * scale, z1 * scale), z1 * scale);
 			pushFloat2(0.0f, 1.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
 			pushVec3(colorLL);
 			pushVec3(colorLR);
 			
-			pushFloat3(x1 * scale, 0, z1 * scale);
+			pushFloat3(x1 * scale, perlinNoise(x1 * scale, z1 * scale), z1 * scale);
 			pushFloat2(1.0f, 1.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
 			pushVec3(colorLL);
 			pushVec3(colorLR);
 			
-			pushFloat3(x1 * scale, 0, z0 * scale);
+			pushFloat3(x1 * scale, perlinNoise(x1* scale, z0* scale), z0 * scale);
 			pushFloat2(1.0f, 0.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
