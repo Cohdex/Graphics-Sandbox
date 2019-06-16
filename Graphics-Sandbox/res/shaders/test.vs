@@ -1,15 +1,21 @@
 #version 330 core
 
 layout(location=0) in vec3 in_position;
-layout(location=1) in vec3 in_color;
-layout(location=2) in vec2 in_barycentric;
+layout(location=1) in vec2 in_texcoord;
+layout(location=2) in vec3 in_colorUL;
+layout(location=3) in vec3 in_colorUR;
+layout(location=4) in vec3 in_colorLL;
+layout(location=5) in vec3 in_colorLR;
 
 out VS_OUT
 {
 	vec3 position;
+	vec2 texcoord;
 	vec3 normal;
-	vec3 color;
-	vec2 barycentric;
+	vec3 colorUL;
+	vec3 colorUR;
+	vec3 colorLL;
+	vec3 colorLR;
 } vs_out;
 
 uniform mat4 u_projection;
@@ -35,19 +41,22 @@ void main()
 {
 	vec4 worldPos = u_model * vec4(in_position, 1.0);
 
-	worldPos.xyz += noise(worldPos.xz / 1.5) / 1.5;
+	worldPos.y += noise(worldPos.xz / 1.5) / 1.5;
 	float offset = 0.001;
 	vec3 dx = worldPos.xyz + vec3(offset, 0.0, 0.0);
-	dx += noise(dx.xz / 1.5) / 1.5;
+	dx.y += noise(dx.xz / 1.5) / 1.5;
 	vec3 dz = worldPos.xyz + vec3(0.0, 0.0, offset);
-	dz += noise(dz.xz / 1.5) / 1.5;
+	dz.y += noise(dz.xz / 1.5) / 1.5;
 
 	vec3 normal = normalize(cross(dz, dx));
 
 	vs_out.position = worldPos.xyz;
+	vs_out.texcoord = in_texcoord;
 	vs_out.normal = normal;
-	vs_out.color = in_color;
-	vs_out.barycentric = in_barycentric;
+	vs_out.colorUL = in_colorUL;
+	vs_out.colorUR = in_colorUR;
+	vs_out.colorLL = in_colorLL;
+	vs_out.colorLR = in_colorLR;
 
 	gl_Position = u_projection * u_view * worldPos;
 }

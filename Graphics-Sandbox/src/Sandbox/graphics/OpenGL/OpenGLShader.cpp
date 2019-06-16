@@ -81,7 +81,7 @@ namespace sbx
 		glDeleteProgram(m_id);
 	}
 
-	void OpenGLShader::bind()
+	void OpenGLShader::bind() const
 	{
 		glUseProgram(m_id);
 	}
@@ -114,5 +114,10 @@ namespace sbx
 	void OpenGLShader::setUniform(const std::string& name, glm::mat4 value)
 	{
 		glUniformMatrix4fv(getUniformLocation(m_id, name), 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::setUniform(const std::string& name, int value)
+	{
+		glUniform1iv(getUniformLocation(m_id, name), 1, &value);
 	}
 }

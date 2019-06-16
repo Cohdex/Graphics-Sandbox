@@ -29,7 +29,8 @@ project "Graphics-Sandbox"
 		"%{prj.name}/src/pch/",
 		"%{prj.name}/include/",
 		"%{prj.name}/extlib/GLFW/include/",
-		"%{prj.name}/extlib/GLM/include/"
+		"%{prj.name}/extlib/GLM/include/",
+		"%{prj.name}/extlib/stb/"
 	}
 
 	libdirs {

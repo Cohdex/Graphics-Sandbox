@@ -5,8 +5,8 @@
 
 namespace sbx
 {
-	VertexArray* VertexArray::create(uint32_t elementCount, const Shader& shader)
+	VertexArray* VertexArray::create(uint32_t elementCount)
 	{
-		return new OpenGLVertexArray(elementCount, shader);
+		return new OpenGLVertexArray(elementCount);
 	}
 }

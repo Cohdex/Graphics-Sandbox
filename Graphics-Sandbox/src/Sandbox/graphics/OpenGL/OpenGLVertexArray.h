@@ -10,10 +10,9 @@ namespace sbx
 	{
 	private:
 		uint32_t m_id;
-		const OpenGLShader& m_shader;
 
 	public:
-		OpenGLVertexArray(uint32_t elementCount, const Shader& shader);
+		OpenGLVertexArray(uint32_t elementCount);
 		virtual ~OpenGLVertexArray();
 
 		virtual void bindVertexBuffer(const VertexBuffer& vertexBuffer) override;
