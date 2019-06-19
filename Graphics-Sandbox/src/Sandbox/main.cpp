@@ -5,6 +5,7 @@
 #include <Sandbox/graphics/Shader.h>
 #include <Sandbox/graphics/Texture.h>
 #include <Sandbox/scene/Camera.h>
+#include <Sandbox/scene/Terrain.h>
 #include <Sandbox/util/Noise.h>
 
 #include <cinttypes>
@@ -36,7 +37,17 @@ int main() {
 	std::default_random_engine generator;
 	std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 	std::map<uint64_t, glm::vec3> colorMap;
-	sbx::PerlinNoise perlinNoise;
+	std::unique_ptr<sbx::Noise> noise(new sbx::SimplexNoise());
+	double noiseMin = 1.0;
+	double noiseMax = -1.0;
+	for (int i = 0; i < 1000; i++)
+	{
+		double noiseSample = std::uniform_real_distribution<double>(0.0, 256.0)(generator);
+		double noiseVal = noise->noise(noiseSample);
+		noiseMin = glm::min(noiseMin, noiseVal);
+		noiseMax = glm::max(noiseMax, noiseVal);
+	}
+	std::cout << "noiseMin: " << noiseMin << ", noiseMax: " << noiseMax << std::endl;
 	uint32_t size = 100;
 	float scale = 0.1f;
 	for (uint32_t z = 0; z < size; z++)
@@ -95,28 +106,42 @@ int main() {
 			colorLL = getColor(createKey(x0, z1));
 			colorLR = getColor(createKey(x1, z1));
 
-			pushFloat3(x0 * scale, perlinNoise(x0 * scale, z0 * scale), z0 * scale);
+			auto height = [&noise](float x, float z) {
+				float amplitude = 8;
+				float frequency = 1;
+				double sum = 0;
+				for (int i = 0; i < 8; i++)
+				{
+					sum += noise->noise(x / frequency, z / frequency) * amplitude;
+					amplitude /= 2;
+					frequency *= 2;
+				}
+				//return (float)(sum / 8);
+				return static_cast<float>(noise->noise(x, z));
+			};
+
+			pushFloat3(x0 * scale, height(x0 * scale, z0 * scale), z0 * scale);
 			pushFloat2(0.0f, 0.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
 			pushVec3(colorLL);
 			pushVec3(colorLR);
 
-			pushFloat3(x0 * scale, perlinNoise(x0 * scale, z1 * scale), z1 * scale);
+			pushFloat3(x0 * scale, height(x0 * scale, z1 * scale), z1 * scale);
 			pushFloat2(0.0f, 1.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
 			pushVec3(colorLL);
 			pushVec3(colorLR);
 			
-			pushFloat3(x1 * scale, perlinNoise(x1 * scale, z1 * scale), z1 * scale);
+			pushFloat3(x1 * scale, height(x1 * scale, z1 * scale), z1 * scale);
 			pushFloat2(1.0f, 1.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
 			pushVec3(colorLL);
 			pushVec3(colorLR);
 			
-			pushFloat3(x1 * scale, perlinNoise(x1* scale, z0* scale), z0 * scale);
+			pushFloat3(x1 * scale, height(x1 * scale, z0 * scale), z0 * scale);
 			pushFloat2(1.0f, 0.0f);
 			pushVec3(colorUL);
 			pushVec3(colorUR);
@@ -124,12 +149,24 @@ int main() {
 			pushVec3(colorLR);
 
 			int baseIndex = (x + z * size) * 4;
-			indices.emplace_back(baseIndex + 0);
-			indices.emplace_back(baseIndex + 1);
-			indices.emplace_back(baseIndex + 2);
-			indices.emplace_back(baseIndex + 2);
-			indices.emplace_back(baseIndex + 3);
-			indices.emplace_back(baseIndex + 0);
+			if ((x + z) % 2 == 0)
+			{
+				indices.emplace_back(baseIndex + 0);
+				indices.emplace_back(baseIndex + 1);
+				indices.emplace_back(baseIndex + 2);
+				indices.emplace_back(baseIndex + 2);
+				indices.emplace_back(baseIndex + 3);
+				indices.emplace_back(baseIndex + 0);
+			}
+			else
+			{
+				indices.emplace_back(baseIndex + 1);
+				indices.emplace_back(baseIndex + 2);
+				indices.emplace_back(baseIndex + 3);
+				indices.emplace_back(baseIndex + 3);
+				indices.emplace_back(baseIndex + 0);
+				indices.emplace_back(baseIndex + 1);
+			}
 		}
 	}
 
@@ -140,6 +177,8 @@ int main() {
 
 	std::unique_ptr<sbx::IndexBuffer> ibo(sbx::IndexBuffer::create(indices.data(), indices.size()));
 	vao->bindIndexBuffer(*ibo);
+
+	std::unique_ptr<sbx::Terrain> terrain(new sbx::Terrain(50, 50, 10));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -234,12 +273,14 @@ int main() {
 		vao->bind();
 		if (vao->hasIndexBuffer())
 		{
-			glDrawElements(GL_TRIANGLES, vao->getElementCount(), GL_UNSIGNED_INT, nullptr);
+			//glDrawElements(GL_TRIANGLES, vao->getElementCount(), GL_UNSIGNED_INT, nullptr);
 		}
 		else
 		{
 			glDrawArrays(GL_TRIANGLES, 0, vao->getElementCount());
 		}
+
+		terrain->draw();
 	}
 
 	return 0;
