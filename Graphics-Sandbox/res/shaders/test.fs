@@ -25,7 +25,7 @@ void main()
 	vec3 colorLower = mix(fs_in.colorLL, fs_in.colorLR, smoothstep(0.0, 1.0, fs_in.texcoord.x));
 	vec3 color = mix(colorUpper, colorLower, smoothstep(0.0, 1.0, fs_in.texcoord.y));
 
-	//color *= texColor;
+	color = texColor;
 
 	fragColor = vec4(pow(color, vec3(1.0 / 1.0)), 1.0);
 }

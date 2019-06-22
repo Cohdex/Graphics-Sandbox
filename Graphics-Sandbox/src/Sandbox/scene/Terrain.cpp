@@ -30,7 +30,7 @@ namespace sbx
 
 		std::default_random_engine generator;
 		std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-		std::unique_ptr<sbx::Noise> noise(new sbx::PerlinNoise());
+		std::unique_ptr<sbx::Noise> noise(new sbx::SimplexNoise());
 		std::map<uint64_t, glm::vec3> colorMap;
 		for (uint32_t z = 0; z < zVertCount; z++)
 		{
@@ -94,17 +94,22 @@ namespace sbx
 				colorLR = getColor(createKey(x1, z1));
 
 				auto height = [&noise](float x, float z) {
-					float amplitude = 8;
-					float frequency = 1;
-					double sum = 0;
-					for (int i = 0; i < 8; i++)
+					x /= 4;
+					z /= 4;
+					double persistence = 0.5;
+					int octaves = 6;
+					double frequency = 1;
+					double amplitude = 1;
+					double total = 0;
+					double max = 0;
+					for (int i = 0; i < octaves; i++)
 					{
-						sum += noise->noise(x / frequency, z / frequency) * amplitude;
-						amplitude /= 2;
+						total += noise->noise(x * frequency, z * frequency) * amplitude;
+						max += amplitude;
+						amplitude *= persistence;
 						frequency *= 2;
 					}
-					//return (float)(sum / 8);
-					return static_cast<float>(noise->noise(x, z));
+					return static_cast<float>(total / max);
 				};
 
 				pushFloat3(p0x, height(p0x, p0z), p0z);
